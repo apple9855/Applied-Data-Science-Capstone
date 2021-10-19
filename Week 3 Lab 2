@@ -82,14 +82,14 @@ def get_pie_chart(entered_site):
 
 def get_scatter_plot(entered_site, payloadslider):
     minimum, maximum = payloadslider
-    filtered_df = spacex_df[spacex_df['Payload Mass (kg)']].between(minimum, maximum)
+    filtered_df = spacex_df[spacex_df['Payload Mass (kg)'].between(minimum, maximum)]
     if entered_site == 'ALL':
         fig = px.scatter(filtered_df, x  = 'Payload Mass (kg)', y = 'class', color = 'Booster Version Category', title = f'Mission Outcome vs. Payload Mass (kg) for all Sites')
         return fig 
     else: 
         second_filtered_df = filtered_df[filtered_df['Launch Site'] == entered_site]
-        second_fig = px.scatter(second_filtered_df, x  = 'Payload Mass (kg)', y = 'class', color = 'Booster Version Category', title = f'Mission Outcome vs. Payload Mass (kg) for {entered_site}')
-        return second_fig
+        fig = px.scatter(second_filtered_df, x  = 'Payload Mass (kg)', y = 'class', color = 'Booster Version Category', title = f'Mission Outcome vs. Payload Mass (kg) for {entered_site}')
+        return fig
 
 # Run the app
 if __name__ == '__main__':
