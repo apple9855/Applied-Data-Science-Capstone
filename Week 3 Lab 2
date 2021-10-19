@@ -83,7 +83,7 @@ def get_pie_chart(entered_site):
 def get_scatter_plot(entered_site, payloadslider):
     minimum = payloadslider[0]
     maximum = payloadslider[1]
-    filtered_df = spacex_df[(spacex_df['Payload Mass (kg)'] > minimum) & (spacex_df['Payload Mass (kg)'] < maximum)]
+    filtered_df = spacex_df[spacex_df['Payload Mass (kg)']].between(minimum, maximum)
     if entered_site == 'ALL':
         fig = px.scatter(filtered_df, x  = 'Payload Mass (kg)', y = 'Mission Outcome', color = 'Booster Version Category')
         return fig 
