@@ -21,7 +21,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                 # TASK 1: Add a dropdown list to enable Launch Site selection
                                 # The default select value is for ALL sites
                                 # dcc.Dropdown(id='site-dropdown',...)
-                                dcc.Dropwdonw(id = 'site-dropdown', 
+                                dcc.Dropwdown(id = 'site-dropdown', 
                                                 options = [
                                                     {'label': 'All Sites', 'value': 'ALL'},
                                                     {'label': 'CCAFS LC-40', 'value': 'CCAFS LC-40'},
@@ -50,7 +50,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
                                                 min = 0, max = 10000, step = 1000,
                                                 marks = {0: '0',
                                                         100: '100'},
-                                                        values = [min, max])
+                                                        values = [min_payload, max_payload])
 
                                 # TASK 4: Add a scatter chart to show the correlation between payload and launch success
                                 html.Div(dcc.Graph(id='success-payload-scatter-chart')),
@@ -58,7 +58,7 @@ app.layout = html.Div(children=[html.H1('SpaceX Launch Records Dashboard',
 
 # TASK 2:
 # Add a callback function for `site-dropdown` as input, `success-pie-chart` as output
-@app.callback(Output(componenet_id = 'success-pie-charat', component_property = 'figure'),
+@app.callback(Output(componenet_id = 'success-pie-chart', component_property = 'figure'),
             Input(component_id = 'site-dropdown', component_property = 'value'))
 def get_pie_chart(entered_site):
     filtered_df = spacex_df
@@ -69,7 +69,7 @@ def get_pie_chart(entered_site):
         return fig
     else:
         filtered_df = spacex_df[spacex_df['Launch Site'] == entered_site]
-        filtered_df.groupby(['Launch Site','class']).size().reset_index(name='class count')
+        filtered_df = filtered_df.groupby(['Launch Site','class']).size().reset_index(name='class count')
         fig = px.pie(filtered_df, values = 'class count', names = 'class', title = 'Launch Success Counts')
         return fig
 
@@ -77,18 +77,18 @@ def get_pie_chart(entered_site):
 
 # TASK 4:
 # Add a callback function for `site-dropdown` and `payload-slider` as inputs, `success-payload-scatter-chart` as output
-@app.callback(Output(component_id = 'site-dropdown', component_property = 'value'),
+@app.callback(Output(component_id = 'success-payload-scatter-chart', component_property = 'value'),
             [Input(component_id = 'site-dropdown', component_property = 'value'), Input(component_id = "payload-slider", component_property = "value")])
 
-def get_scatter_plot(entered_site):
-    filtered_df = spacex_df
+def get_scatter_plot(entered_site, payloadslider):
+    filtered_df = spacex_df[(spacex_df['Payload Mass (kg)'] > min_payload) & (spacex_df['Payload Mass (kg)'] < max_payload)]
     if entered_site == 'ALL':
         fig = px.scatter(filtered_df, x  = 'Payload Mass (kg)', y = 'Mission Outcome', color = 'Booster Version Category')
         return fig 
     else: 
-        filtered_df = spacex_df.loc[spacex_df['Launch Site'] == entered_site]
-        fig = px.scatter(filtered_df, x  = 'Payload Mass (kg)', y = 'Mission Outcome', color = 'Booster Version Category')
-        return fig
+        second_filtered_df = filtered_df[filtered_df['Launch Site'] == entered_site]
+        second_fig = px.scatter(second_filtered_df, x  = 'Payload Mass (kg)', y = 'Mission Outcome', color = 'Booster Version Category')
+        return second_fig
 
 # Run the app
 if __name__ == '__main__':
